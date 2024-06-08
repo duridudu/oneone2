@@ -18,22 +18,9 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import com.duridudu.oneone2.databinding.ActivityMainBinding
-import com.duridudu.oneone2.databinding.CalenderDayLayoutBinding
 import com.duridudu.oneone2.databinding.FragmentCalenderBinding
-import com.kizitonwose.calendar.core.CalendarDay
-import com.kizitonwose.calendar.core.DayPosition
-import com.kizitonwose.calendar.core.WeekDay
-import com.kizitonwose.calendar.core.WeekDayPosition
-import com.kizitonwose.calendar.core.atStartOfMonth
-import com.kizitonwose.calendar.core.daysOfWeek
-import com.kizitonwose.calendar.duridudu.shared.displayText
-import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
-import com.kizitonwose.calendar.core.yearMonth
-import com.kizitonwose.calendar.view.CalendarView
-import com.kizitonwose.calendar.view.MonthDayBinder
-import com.kizitonwose.calendar.view.ViewContainer
-import com.kizitonwose.calendar.view.WeekCalendarView
-import com.kizitonwose.calendar.view.WeekDayBinder
+import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
+
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -51,38 +38,26 @@ private const val ARG_PARAM2 = "param2"
  */
 @Suppress("UNREACHABLE_CODE")
 class Calender : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
     lateinit var binding:FragmentCalenderBinding
 
-    private val monthCalendarView: CalendarView get() = binding.calendarView
-    private val weekCalendarView: WeekCalendarView get() = binding.exOneWeekCalendar
 
-    private val selectedDates = mutableSetOf<LocalDate>()
-    @RequiresApi(Build.VERSION_CODES.O)
-    private val today = LocalDate.now()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
 
-
+        //binding.calendarView.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays)))
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding=FragmentCalenderBinding.inflate(inflater)
         return binding.root
-
 
 
     }

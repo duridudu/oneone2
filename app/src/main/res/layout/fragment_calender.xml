@@ -34,21 +34,19 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/setting" />
 
-
         <com.prolificinteractive.materialcalendarview.MaterialCalendarView
             android:id="@+id/calendarView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="24dp"
-            android:theme="@style/"
-            app:mcv_selectionMode="range"
-            app:mcv_showOtherDates="all"
-            app:mcv_firstDayOfWeek="sunday"
-            app:mcv_rightArrow="@drawable/ic_arrow_right_cal"
-            app:mcv_leftArrow="@drawable/ic_arrow_left"
-            app:mcv_dateTextAppearance="@style/CalenderViewDateCustomText"
-            app:mcv_weekDayTextAppearance="@style/CalenderViewWeekCustomText"/>
+            android:layout_margin="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/logo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:mcv_selectionColor="#5a7fbf"
+            app:mcv_headerTextAppearance="@style/CalendarWidgetHeader"
+            />
+
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/calendarRecyclerview"
