@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "509001380980",
+    "project_id": "oneone2-4660f",
+    "storage_bucket": "oneone2-4660f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:509001380980:android:df2983eec56f7246660d21",
+        "android_client_info": {
+          "package_name": "com.duridudu.oneone2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "509001380980-aj8qr719ka69cfom9dqnu3tfqq6es1bv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.duridudu.oneone2",
+            "certificate_hash": "19d05b01d1e3d0093ea1d131969e8b7968b6ae41"
+          }
+        },
+        {
+          "client_id": "509001380980-ar59bk9av8joju3irna82p89qcg5k2h9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvV8KkoEaY16TEv-V149pIXS0zElyl6gI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "509001380980-ar59bk9av8joju3irna82p89qcg5k2h9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

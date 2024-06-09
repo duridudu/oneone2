@@ -2,4 +2,5 @@
     <string name="app_name">oneone2</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="default_web_client_id">509001380980-aj8qr719ka69cfom9dqnu3tfqq6es1bv.apps.googleusercontent.com</string>
 </resources>
