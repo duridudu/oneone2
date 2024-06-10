@@ -7,7 +7,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.duridudu.oneone2.databinding.ActivityLoginBinding
-import com.duridudu.oneone2.databinding.ActivityMainBinding
+import com.duridudu.oneone2.model.User
+import com.duridudu.oneone2.viewmodel.UserViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -19,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var firebaseAuth: FirebaseAuth
-
+    private lateinit var userViewModel: UserViewModel
     private val googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             result ->
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -39,12 +40,28 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        var name:String = ""
+        var email:String = ""
+        var photoUrl:String = ""
+        var uid:String = ""
 
         // Firebase Authentication 인스턴스 초기화
         firebaseAuth = FirebaseAuth.getInstance()
 
         // 이미 로그인되어 있는지 확인
         if (firebaseAuth.currentUser != null) {
+            val user = firebaseAuth.currentUser
+            user?.let {
+                // Name, email address, and profile photo Url
+                name = it.displayName.toString()
+                email = it.email.toString()
+                photoUrl = it.photoUrl.toString()
+                uid = it.uid
+            }
+            Log.d("USER++",name+email+photoUrl+"++"+uid)
+            val nowUser = User(uid=uid, email=email, name=name)
+
+            userViewModel.insert(nowUser)
             // 이미 로그인된 경우 메인 화면으로 이동
             startActivity(Intent(this, MainActivity::class.java))
             finish()
@@ -66,6 +83,8 @@ class LoginActivity : AppCompatActivity() {
             signIn()
         }
     }
+
+
 
     private fun signIn() {
         val signInIntent = googleSignInClient.signInIntent
