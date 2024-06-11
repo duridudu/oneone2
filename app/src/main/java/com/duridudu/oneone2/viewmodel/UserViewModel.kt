@@ -1,5 +1,7 @@
 package com.duridudu.oneone2.viewmodel
 
+import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duridudu.oneone2.model.User
@@ -8,20 +10,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UserViewModel:ViewModel() {
-   /// val nowUser: User
+   // var user = User()
     private val userRepository:UserRepository = UserRepository.get()
-    init {
-        //nowUser = userRepository.getUser()
-    }
+//    init {
+//        user = userRepository.getUser()
+//    }
 
+    fun getUser() = userRepository.getUser()
     fun getOne(id : String) = userRepository.getOne(id)
-    fun insert(dto: User) {
+    fun insert(dto: User) = viewModelScope.launch(Dispatchers.IO){
+        Log.d("USER++333", dto.uid+dto.name+dto.email+dto.profileurl)
         userRepository.insert(dto)
     }
-    fun update(dto:User) = viewModelScope.launch(Dispatchers.IO){
-        userRepository.update(dto)
-    }
-    fun delete(dto:User)=viewModelScope.launch(Dispatchers.IO){
+//    suspend fun update(dto:User) {
+//        userRepository.update(dto)
+//    }
+    fun delete(dto:User){
         userRepository.delete(dto)
     }
 }

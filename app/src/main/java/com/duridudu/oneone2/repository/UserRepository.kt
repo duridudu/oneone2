@@ -1,6 +1,7 @@
 package com.duridudu.oneone2.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.duridudu.oneone2.model.User
@@ -33,7 +34,9 @@ class UserRepository private constructor(context: Context){
         private var INSTANCE: UserRepository?=null
 
         fun initialize(context: Context){
+            Log.d("REPOSITORY++", "initialize")
             if (INSTANCE==null){
+                Log.d("REPOSITORY++2", "INSTANCE==null")
                 INSTANCE = UserRepository(context)
             }
         }

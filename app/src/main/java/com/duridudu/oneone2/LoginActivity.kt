@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.ViewModelProvider
 import com.duridudu.oneone2.databinding.ActivityLoginBinding
 import com.duridudu.oneone2.model.User
 import com.duridudu.oneone2.viewmodel.UserViewModel
@@ -15,6 +16,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
@@ -40,28 +44,31 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        var name:String = ""
-        var email:String = ""
-        var photoUrl:String = ""
-        var uid:String = ""
-
+        Log.d("USER0+++", "TEST")
+        // ViewModelProvider를 사용하여 ViewModel 초기화
+       userViewModel  = ViewModelProvider(this)[UserViewModel::class.java]
         // Firebase Authentication 인스턴스 초기화
         firebaseAuth = FirebaseAuth.getInstance()
 
         // 이미 로그인되어 있는지 확인
         if (firebaseAuth.currentUser != null) {
             val user = firebaseAuth.currentUser
-            user?.let {
-                // Name, email address, and profile photo Url
-                name = it.displayName.toString()
-                email = it.email.toString()
-                photoUrl = it.photoUrl.toString()
-                uid = it.uid
-            }
-            Log.d("USER++",name+email+photoUrl+"++"+uid)
-            val nowUser = User(uid=uid, email=email, name=name)
+            // 사용자 정보를 가져와서 ViewModel을 통해 저장
+            val name = user?.displayName ?: ""
+            val email = user?.email ?: ""
+            val photoUrl = user?.photoUrl?.toString() ?: ""
+            val uid = user?.uid ?: ""
+            val nowUser = User(uid=uid, name = name, email = email, profileurl = photoUrl)
 
-            userViewModel.insert(nowUser)
+
+            Log.d("USER++",uid+"+++"+name)
+            Log.d("USER++2222",nowUser.uid+"++++"+nowUser.name)
+            CoroutineScope(Dispatchers.IO).launch {
+                userViewModel.insert(nowUser)
+            }
+//            val nowUser:User = User(uid,name, email, photoUrl)
+
+//            userViewModel.insert(nowUser)
             // 이미 로그인된 경우 메인 화면으로 이동
             startActivity(Intent(this, MainActivity::class.java))
             finish()

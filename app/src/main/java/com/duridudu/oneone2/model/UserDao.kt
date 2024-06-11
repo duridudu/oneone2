@@ -1,5 +1,6 @@
 package com.duridudu.oneone2.model
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
@@ -15,7 +16,7 @@ interface UserDao {
     fun insert(dto: User)
 
     // 쿼리 메소드
-    @Query("select * from userTable")
+    @Query("select * from userTable limit 1")
     fun getUser(): User
 
     @Query("select * from userTable where uid = (:id)")
