@@ -66,7 +66,10 @@ class LoginActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.IO).launch {
                 userViewModel.insert(nowUser)
             }
-//            val nowUser:User = User(uid,name, email, photoUrl)
+
+
+           //val nowUser2:User = userViewModel.getUser()
+            //Toast.makeText(this, "환영합니다, ${nowUser2}!", Toast.LENGTH_SHORT).show()
 
 //            userViewModel.insert(nowUser)
             // 이미 로그인된 경우 메인 화면으로 이동

@@ -19,11 +19,11 @@ class UserRepository private constructor(context: Context){
     private val userDao = database.userDao()
 
     // 서비스단에서 사용할 함수(구 메소드 현 함수)
-    fun getUser(): User = userDao.getUser()
+    suspend fun getUser():User = userDao.getUser()
 
     fun getOne(id:String):User = userDao.selectOne(id)
 
-    fun insert(dto: User) = userDao.insert(dto)
+    suspend fun insert(dto: User) = userDao.insert(dto)
 
     suspend fun update(dto : User) = userDao.update(dto)
 

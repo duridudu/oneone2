@@ -9,8 +9,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.duridudu.oneone2.databinding.ActivityMainBinding
 import com.duridudu.oneone2.model.User
 import com.duridudu.oneone2.viewmodel.UserViewModel
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -22,9 +23,20 @@ class MainActivity : AppCompatActivity() {
         val bottomBar = binding.bottomNavigation
         setContentView(view)
         userViewModel  = ViewModelProvider(this)[UserViewModel::class.java]
+        Log.d("MAIN++1", "TEST")
+        CoroutineScope(Dispatchers.Main).launch{
+            // 코루틴 내에서 getUser() 메서드 호출
+            val user: User = userViewModel.getUser()
+            Log.d("MainActivity", "User: $user")
+            val names = user.name
+            // 여기서 UI를 업데이트하는 작업 수행
+            Toast.makeText(applicationContext, "환영합니다, ${user.name}!", Toast.LENGTH_SHORT).show()
+        }
+
+
         //val name: User = userViewModel.getUser()
-       //Log.d("MAIN++", name.name)
-        //Toast.makeText(this, "환영합니다, ${name}!", Toast.LENGTH_SHORT).show()
+        //Log.d("MAIN++2", name.name)
+
         changeFragment(Calender())
 
         bottomBar.run{
@@ -38,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                       changeFragment(Write())
                   }
                   R.id.tab3->{
-                      changeFragment(List())
+                      changeFragment(Lists())
                   }
           }
               true
