@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.duridudu.oneone2.databinding.ActivityMainBinding
 import com.duridudu.oneone2.model.User
 import com.duridudu.oneone2.viewmodel.UserViewModel
+import io.github.muddz.styleabletoast.StyleableToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("MainActivity", "User: $user")
             val names = user.name
             // 여기서 UI를 업데이트하는 작업 수행
-            Toast.makeText(applicationContext, "환영합니다, ${user.name}!", Toast.LENGTH_SHORT).show()
+            StyleableToast.makeText(applicationContext, "환영합니다, ${user.name}!", R.style.myToast).show()
         }
 
 

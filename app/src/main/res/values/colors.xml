@@ -5,4 +5,5 @@
     <color name="gray0">#FFFFFF00</color>
     <color name="gray200">#FFFF0000</color>
     <color name="text100">#4A5660</color>
+    <color name="main">#4A5660</color>
 </resources>

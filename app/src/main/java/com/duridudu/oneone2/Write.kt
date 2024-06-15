@@ -14,6 +14,7 @@ import com.duridudu.oneone2.model.Diary
 import com.duridudu.oneone2.viewmodel.DiaryViewModel
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import io.github.muddz.styleabletoast.StyleableToast
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -64,7 +65,7 @@ class Write : Fragment() {
         viewModel = ViewModelProvider(requireActivity()).get(DiaryViewModel::class.java)
 
         // ViewModel에서 선택된 Diary 가져오기
-        val selectedDiary = viewModel.getSelectedDiary()
+        var selectedDiary = viewModel.getSelectedDiary()
 
         // 수정으로 넘어온 경우!! 하 수정버튼을 만드는게 낫겠음.. 쩝
         if (selectedDiary != null) {
@@ -105,23 +106,24 @@ class Write : Fragment() {
         // 최종 등록 버튼
         binding.btnRegister.setOnClickListener {
             if (binding.title.text == null){
-                Toast.makeText(context, "제목을 입력해주세요!", Toast.LENGTH_SHORT).show()
+                StyleableToast.makeText(requireContext(), "제목을 입력해주세요!", R.style.myToast).show()
             }
             else{
-                Toast.makeText(context, "저장되었습니다.", Toast.LENGTH_SHORT).show()
+                StyleableToast.makeText(requireContext(), "저장되었습니다.",R.style.myToast).show()
             }
 
             Log.d("WRITE++", "Register : $diaryId")
             // 예시로 사용할 다이어리 데이터
-            val diary = Diary(
-                diaryId = diaryId,
-                title =  binding.title.text.toString(),
-                content = content,
-                timestamp = getCurrentTimestamp(),
-                photoUrl = photoUrl
-            )
+
 
             if (selectedDiary != null) {
+                val diary = Diary(
+                    diaryId = diaryId,
+                    title =  binding.title.text.toString(),
+                    content = content,
+                    timestamp = getCurrentTimestamp(),
+                    photoUrl = photoUrl
+                )
                 // 해당 경로의 데이터를 업데이트
                 diaryRef.setValue(diary)
                     .addOnSuccessListener {
@@ -134,6 +136,12 @@ class Write : Fragment() {
                     }
             }
             else{
+                val diary = Diary(
+                    title =  binding.title.text.toString(),
+                    content = content,
+                    timestamp = getCurrentTimestamp(),
+                    photoUrl = photoUrl
+                )
                 // 새로운 다이어리 추가
                 val newDiaryRef = diaryRef.push()
                 newDiaryRef.setValue(diary)
@@ -144,7 +152,6 @@ class Write : Fragment() {
             }
 
         }
-
     }
 
     private fun initFirebase(s: String, key:String?) {

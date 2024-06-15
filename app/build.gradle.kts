@@ -77,4 +77,7 @@ dependencies {
 
     // firebase real time database
     implementation("com.google.firebase:firebase-database-ktx:20.0.4")
+
+    // Toast
+    implementation("io.github.muddz:styleabletoast:2.4.0")
 }

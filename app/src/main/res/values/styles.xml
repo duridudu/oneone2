@@ -21,4 +21,22 @@
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/text100</item>
     </style>
+
+    <!-- Toast 스타일 -->
+    <style name="myToast">
+        <item name="stTextBold">true</item>
+        <item name="stTextColor">@color/white</item>
+        <item name="stFont">@font/onbyul</item>
+        <item name="stTextSize">14sp</item>
+        <item name="stColorBackground">@color/main</item>
+        <item name="stSolidBackground">true</item>
+        <item name="stStrokeWidth">3dp</item>
+        <item name="stStrokeColor">#fff</item>
+<!--        <item name="stIconStart">@drawable/</item>-->
+<!--        <item name="stIconEnd">@drawable/favorite</item>-->
+        <item name="stLength">SHORT</item> LONG or SHORT
+        <item name="stGravity">top</item> top or center
+        <item name="stRadius">20dp</item>
+    </style>
+
 </resources>
