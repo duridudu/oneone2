@@ -39,7 +39,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/listDate"
-            tools:listitem="@layout/item_dairies" />
+            tools:listitem="@layout/item_diaries" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
