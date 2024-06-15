@@ -6,11 +6,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.duridudu.oneone2.adapter.DiaryAdapter
 import com.duridudu.oneone2.databinding.FragmentWriteBinding
 import com.duridudu.oneone2.model.Diary
+import com.duridudu.oneone2.viewmodel.DiaryViewModel
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -23,6 +29,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class Write : Fragment() {
+
     // TODO: Rename and change types of parameters
     lateinit var binding: FragmentWriteBinding
     lateinit var  diaryAdapter: DiaryAdapter
@@ -30,6 +37,13 @@ class Write : Fragment() {
     private lateinit var diaryRef: DatabaseReference
     private lateinit var userId: String // 사용자의 고유 식별자
 
+    private var title: String = "" // 입력된 제목
+    private var content: String = "" // 입력된 내용
+    private var photoUrl: String = "" // 입력된 내용
+    private var diaryId : String? = null // 파이어베이스 다이어리객체 고유 키
+
+    // 작성된 글일 경우 불러오기 위한 뷰모델
+    private lateinit var viewModel: DiaryViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -47,26 +61,115 @@ class Write : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(requireActivity()).get(DiaryViewModel::class.java)
 
+        // ViewModel에서 선택된 Diary 가져오기
+        val selectedDiary = viewModel.getSelectedDiary()
+
+        // 수정으로 넘어온 경우!! 하 수정버튼을 만드는게 낫겠음.. 쩝
+        if (selectedDiary != null) {
+
+            // 일기 영역 보이게
+            binding.btnWrite.visibility = View.INVISIBLE
+            binding.writeContent.visibility = View.VISIBLE
+
+            // 선택된 Diary 데이터를 UI에 설정하는 코드
+            binding.title.setText(selectedDiary.title)
+            binding.writeContent.setText(selectedDiary.content)
+
+            // 업데이트를 위해 고유키 설정
+            diaryId = selectedDiary.diaryId.toString()
+
+            Log.d("WRITE++", "UPDATE : $diaryId")
+
+            // 수정 버전으로 파이어베이스 생성
+            initFirebase("update", diaryId)
+        }
+        else{
+            Log.d("WRITE++", "CREATE")
+            // 신규 추가 버전으로 파이어베이스 생성
+            initFirebase("create", null)
+        }
+        // 사진 등록
+        binding.btnPhoto.setOnClickListener {
+            binding.btnPhoto.visibility = View.INVISIBLE
+            // 사진 업로드 기능
+
+        }
+        // 일기 등록
+        binding.btnWrite.setOnClickListener {
+            binding.btnWrite.visibility = View.INVISIBLE
+            binding.writeContent.visibility = View.VISIBLE
+        }
+
+        // 최종 등록 버튼
+        binding.btnRegister.setOnClickListener {
+            if (binding.title.text == null){
+                Toast.makeText(context, "제목을 입력해주세요!", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(context, "저장되었습니다.", Toast.LENGTH_SHORT).show()
+            }
+
+            Log.d("WRITE++", "Register : $diaryId")
+            // 예시로 사용할 다이어리 데이터
+            val diary = Diary(
+                diaryId = diaryId,
+                title =  binding.title.text.toString(),
+                content = content,
+                timestamp = getCurrentTimestamp(),
+                photoUrl = photoUrl
+            )
+
+            if (selectedDiary != null) {
+                // 해당 경로의 데이터를 업데이트
+                diaryRef.setValue(diary)
+                    .addOnSuccessListener {
+                    // 성공적으로 업데이트된 경우 처리할 로직
+                    Log.d("Firebase", "Diary updated successfully")
+                }
+                    .addOnFailureListener { e ->
+                        // 업데이트 실패 시 처리할 로직
+                        Log.w("Firebase", "Error updating diary", e)
+                    }
+            }
+            else{
+                // 새로운 다이어리 추가
+                val newDiaryRef = diaryRef.push()
+                newDiaryRef.setValue(diary)
+                val diaryId = newDiaryRef.key // 생성된 고유 키 가져오기
+
+                // Diary 객체에 고유 키 설정
+                newDiaryRef.child("diaryId").setValue(diaryId)
+            }
+
+        }
+
+    }
+
+    private fun initFirebase(s: String, key:String?) {
+        var key = key
         userId = "BKNnNTkD5kgW1VILsAtiib5Tpks2"
-
         // Firebase Database 인스턴스 초기화
         database = FirebaseDatabase.getInstance("https://oneone2-4660f-default-rtdb.asia-southeast1.firebasedatabase.app")
-        diaryRef = database.getReference("users/$userId/diaries")
-        Log.d("WRITE++", "after firebase초기화")
+        try {
+            if (s == "create"){
+                diaryRef = database.getReference("users/$userId/diaries")
+                Log.d("WRITE++", "IN NEW initFirebase")
 
-        // 예시로 사용할 다이어리 데이터
-        val diary = Diary(
-            contentId = 4,
-            title = "Fourth Diary",
-            content = "Content of the fourth diary",
-            timestamp = "2024-06-28",
-            photoUrl = "https://www.google.com/url?sa=i&url=http%3A%2F%2Fs.blip.kr%2Fc%2F8287ef00&psig=AOvVaw1fTSz_x3W-KyNi7o5BeTXI&ust=1718527711483000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCLia79-c3YYDFQAAAAAdAAAAABAE"
-        )
+            }
+            else{
+                diaryRef = database.getReference("users/$userId/diaries/$key")
+                Log.d("WRITE++", "IN UPDATE initFirebase")
+            }
 
-        // 새로운 다이어리 추가
-        val newDiaryRef = diaryRef.push()
-        newDiaryRef.setValue(diary)
+        } catch (e: Exception) {
+            Log.e("WRITE++", "Firebase initialization failed", e)
+        }
+    }
+    private fun getCurrentTimestamp(): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+        return dateFormat.format(Date())
     }
     companion object {
         /**

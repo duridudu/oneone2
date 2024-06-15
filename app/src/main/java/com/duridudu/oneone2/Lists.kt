@@ -1,20 +1,29 @@
 package com.duridudu.oneone2
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duridudu.oneone2.adapter.DiaryAdapter
 import com.duridudu.oneone2.databinding.FragmentListBinding
 import com.duridudu.oneone2.model.Diary
+import com.duridudu.oneone2.viewmodel.DiaryViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -34,6 +43,8 @@ class Lists: Fragment() {
     private lateinit var diaryRef: DatabaseReference
     private lateinit var userId: String // 사용자의 고유 식별자
     private var diariesList = mutableListOf<Diary>()
+    // 프래그먼트 이동을 위한 뷰모델
+    private lateinit var viewModel: DiaryViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -50,17 +61,32 @@ class Lists: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(requireActivity())[DiaryViewModel::class.java]
         Log.d("LIST++", "onViewCreated")
 
-        binding.listRecyclerview.layoutManager = LinearLayoutManager(requireContext())
-        diaryAdapter = DiaryAdapter(requireContext())
-        binding.listRecyclerview.adapter = diaryAdapter
+        // 클릭 이벤트 처리법 같이 줌
+        diaryAdapter = DiaryAdapter { diary ->
+            viewModel.setSelectedDiary(diary)
+            navigateToWriteFragment()
+        }
+
+        binding.listRecyclerview.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = diaryAdapter
+        }
+//        binding.listRecyclerview.layoutManager = LinearLayoutManager(requireContext())
+//        diaryAdapter = DiaryAdapter(requireContext(), )
+//        binding.listRecyclerview.adapter = diaryAdapter
+
+
         Log.d("LIST++", "after adapter")
         // Firebase 초기화 및 데이터 요청은 onViewCreated 내에서 처리
         initFirebase()
         Log.d("LIST++", "after initFirebase")
 
+
     }
+
 
     private fun initFirebase() {
         try {
@@ -89,23 +115,41 @@ class Lists: Fragment() {
 
                   val diary = diarySnapshot.getValue(Diary::class.java)
                    if (diary != null) {
-                       diary.title?.let { Log.d("LIST++", it) }
-                        diary?.let { diariesList.add(it) }
-                   }
+                       //diary.title?.let { Log.d("LIST++", it) }
+                        diary?.let {
+                            // diary.timestamp에서 월 정보 가져오기
+                            val dateString = it.timestamp
+                            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val date = dateFormat.parse(dateString)
 
+                            val calendar = Calendar.getInstance()
+                            calendar.time = date
+
+                            val month = calendar.get(Calendar.MONTH) + 1 // Calendar.MONTH는 0부터 시작하므로 +1 해줘야 함
+
+                            // 여기서 원하는 월(예: 6월)에 해당하는 diary만 diariesList에 추가할 수 있음
+                            if (month == 6) { // 6월에 해당하는 데이터만 추가 예시
+                                diariesList.add(it)
+                            }
+                        }
+                   }
                     }
                      //notifyDataSetChanged()를 호출하여 adapter에게 값이 변경 되었음을 알려준다.
                   diaryAdapter.submitList(diariesList)
                 }
-
                 override fun onCancelled(error: DatabaseError) {
                 }
             }
       diaryRef.addValueEventListener(postListener)
 
-
     }
-
+    private fun navigateToWriteFragment() {
+        val writeFragment = Write()
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.container, writeFragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
 
     companion object {
         private const val TAG = "ListsFragment"

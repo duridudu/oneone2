@@ -21,23 +21,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <EditText
             android:id="@+id/title"
             android:layout_width="409dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
+            android:hint="일정을 입력하세요."
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/date">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="일정을 입력하세요." />
-        </com.google.android.material.textfield.TextInputLayout>
+        </EditText>
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/btnRegister"
             android:layout_width="51dp"
             android:layout_height="48dp"
             android:layout_marginTop="5dp"
@@ -67,7 +63,7 @@
 
         <!-- 등록된 사진이 없는 경우를 위한 버튼 -->
         <Button
-            android:id="@+id/btnRegister"
+            android:id="@+id/btnPhoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="사진 등록하기"
@@ -82,9 +78,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="일기 작성하기"
-            app:layout_constraintTop_toBottomOf="@+id/btnRegister"
+            app:layout_constraintTop_toBottomOf="@+id/btnPhoto"
             app:layout_constraintStart_toStartOf="parent"
             />
+        <EditText
+            android:id="@+id/writeContent"
+            android:layout_width="409dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:hint="일정을 입력하세요."
+            app:layout_constraintTop_toBottomOf="@+id/btnPhoto"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="gone" >
+        </EditText>
 
         <!-- 등록된 사진이 있는 경우를 위한 ImageView -->
         <ImageView
@@ -97,6 +104,8 @@
 
             app:layout_constraintStart_toStartOf="parent"
         android:visibility="gone" /> <!-- 처음에는 사라져 있도록 설정 -->
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
