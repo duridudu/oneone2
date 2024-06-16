@@ -26,6 +26,9 @@
             android:id="@+id/listDate"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
+            android:textSize="20sp"
+            android:fontFamily="@font/hakgyoansim_wooju"
+            android:textStyle="bold"
             android:text="2024년 6월 21일(토)"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/listLogo" />

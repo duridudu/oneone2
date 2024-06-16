@@ -10,101 +10,113 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF">
-
         <TextView
-            android:id="@+id/date"
+            android:id="@+id/writeDate"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="20dp"
-            android:text="2024년 6월 22일 (목)"
+            android:layout_height="40dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="60dp"
+            android:fontFamily="@font/hakgyoansim_wooju"
+            android:hint="날짜를 선택하세요"
+            android:textColor="@color/main"
+            android:textSize="30sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/writeTime"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="20dp"
+            android:fontFamily="@font/hakgyoansim_wooju"
+            android:hint="시간을 선택하세요"
+            android:textColor="@color/main"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/writeDate" />
+
+        <!-- 등록된 사진이 없는 경우를 위한 버튼 -->
+
+        <!-- 등록된 일기가 없는 경우를 위한 버튼 -->
 
         <EditText
             android:id="@+id/title"
-            android:layout_width="409dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="15dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="44dp"
+            android:background="@drawable/shape"
+            android:fontFamily="@font/hakgyoansim_wooju"
             android:hint="일정을 입력하세요."
+            android:padding="20dp"
+            android:textColor="@color/main"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/date">
-        </EditText>
+            app:layout_constraintTop_toBottomOf="@+id/writeTime"></EditText>
 
         <ImageView
             android:id="@+id/btnRegister"
-            android:layout_width="51dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="39dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:src="@drawable/complete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/daynoon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="오후"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
-
-        <TextView
-            android:id="@+id/hour"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="15dp"
-            android:text="TextView"
-            app:layout_constraintStart_toEndOf="@+id/daynoon"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
-
-        <!-- 등록된 사진이 없는 경우를 위한 버튼 -->
         <Button
             android:id="@+id/btnPhoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="140dp"
+            android:layout_marginTop="108dp"
+            android:background="@drawable/shape_button"
+            android:fontFamily="@font/hakgyoansim_wooju"
             android:text="사진 등록하기"
-            app:layout_constraintTop_toBottomOf="@+id/daynoon"
-
             app:layout_constraintStart_toStartOf="parent"
-             />
+            app:layout_constraintTop_toBottomOf="@+id/title" />
 
-        <!-- 등록된 일기가 없는 경우를 위한 버튼 -->
         <Button
             android:id="@+id/btnWrite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="140dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/shape_button"
+            android:fontFamily="@font/hakgyoansim_wooju"
             android:text="일기 작성하기"
-            app:layout_constraintTop_toBottomOf="@+id/btnPhoto"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/btnPhoto" />
+
         <EditText
             android:id="@+id/writeContent"
-            android:layout_width="409dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_margin="8dp"
             android:layout_marginTop="5dp"
+            android:background="@drawable/shape"
+            android:fontFamily="@font/hakgyoansim_wooju"
             android:hint="일정을 입력하세요."
-            app:layout_constraintTop_toBottomOf="@+id/btnPhoto"
+            android:padding="20dp"
+            android:textColor="@color/main"
+            android:textSize="18sp"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            android:visibility="gone" >
-        </EditText>
+            app:layout_constraintTop_toBottomOf="@+id/btnPhoto"></EditText>
 
         <!-- 등록된 사진이 있는 경우를 위한 ImageView -->
         <ImageView
             android:id="@+id/photoImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/shape_button"
             android:scaleType="centerCrop"
-            tools:src="@drawable/logo"
-            app:layout_constraintTop_toBottomOf="@+id/daynoon"
-
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-        android:visibility="gone" /> <!-- 처음에는 사라져 있도록 설정 -->
 
+            tools:src="@drawable/logo" />
+
+      <!-- 처음에는 사라져 있도록 설정 -->
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

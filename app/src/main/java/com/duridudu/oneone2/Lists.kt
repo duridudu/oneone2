@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duridudu.oneone2.adapter.DiaryAdapter
 import com.duridudu.oneone2.databinding.FragmentListBinding
+import com.duridudu.oneone2.databinding.ItemDiariesBinding
 import com.duridudu.oneone2.model.Diary
 import com.duridudu.oneone2.viewmodel.DiaryViewModel
 import com.google.firebase.database.DataSnapshot
@@ -38,6 +39,7 @@ private const val ARG_PARAM2 = "param2"
 class Lists: Fragment() {
     // TODO: Rename and change types of parameters
     lateinit var binding:FragmentListBinding
+    lateinit var listBinding: ItemDiariesBinding
     lateinit var  diaryAdapter:DiaryAdapter
     private lateinit var database: FirebaseDatabase
     private lateinit var diaryRef: DatabaseReference
@@ -68,12 +70,16 @@ class Lists: Fragment() {
         diaryAdapter = DiaryAdapter { diary ->
             viewModel.setSelectedDiary(diary)
             navigateToWriteFragment()
+
+
         }
 
         binding.listRecyclerview.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = diaryAdapter
         }
+
+
 //        binding.listRecyclerview.layoutManager = LinearLayoutManager(requireContext())
 //        diaryAdapter = DiaryAdapter(requireContext(), )
 //        binding.listRecyclerview.adapter = diaryAdapter
@@ -143,6 +149,11 @@ class Lists: Fragment() {
       diaryRef.addValueEventListener(postListener)
 
     }
+
+//    override fun onDeleteClick(diary: Diary) {
+//        // 삭제 버튼이 클릭된 경우 처리할 로직 구현
+//        viewModel.deleteDiary(diary) // 뷰모델에 삭제 명령 전달
+//    }
     private fun navigateToWriteFragment() {
         val writeFragment = Write()
         val transaction = requireActivity().supportFragmentManager.beginTransaction()

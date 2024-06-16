@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("MainActivity", "User: $user")
             val names = user.name
             // 여기서 UI를 업데이트하는 작업 수행
-            StyleableToast.makeText(applicationContext, "환영합니다, ${user.name}!", R.style.myToast).show()
+            StyleableToast.makeText(applicationContext, "환영합니다, ${user.name}! 🥰", R.style.myToast).show()
         }
 
 

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.duridudu.oneone2.databinding.ItemDiariesBinding
 import com.duridudu.oneone2.model.Diary
+import com.google.firebase.database.FirebaseDatabase
 
 class DiaryAdapter(private val onItemClick: (Diary) -> Unit) : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
     private var diaries: List<Diary> = listOf() // 초기화된 빈 리스트로 시작
@@ -17,18 +18,24 @@ class DiaryAdapter(private val onItemClick: (Diary) -> Unit) : RecyclerView.Adap
         var title = binding.listTitle
         var timestamp = binding.tvTimeStamp
         var btnDelete = binding.listDelete
+        // 인터페이스 정의
 
         fun onBind(diary: Diary) {
             //Log.d("ADAPTER++", "onBind")
 
             title.text = diary.title
-            //(title.text as String?)?.let { Log.d("ADAPTER++", it) }
+
             timestamp.text = diary.timestamp
-
-
-            btnDelete.setOnClickListener {
-                // 삭제 리스너
-            }
+            (timestamp.text as String?)?.let { Log.d("ADAPTER++", it) }
+            // 삭제 버튼 클릭 리스너 설정
+//            btnDelete.setOnClickListener {
+//                OnDeleteClickListener.onDeleteClick(diary)
+//            }
+//            btnDelete.setOnClickListener {
+//
+//                // 삭제 리스너
+//
+//            }
 
             itemView.setOnClickListener {
                 // 클릭 시 WriteFragment로
@@ -56,6 +63,12 @@ class DiaryAdapter(private val onItemClick: (Diary) -> Unit) : RecyclerView.Adap
 
     fun submitList(diaries: List<Diary>) {
         this.diaries = diaries
+        Log.d("ADOPTER++", diaries.size.toString())
         notifyDataSetChanged()
     }
+    interface OnDeleteClickListener {
+        fun onDeleteClick(diary: Diary)
+    }
+
+
 }
