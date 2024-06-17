@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.duridudu.oneone2.databinding.ActivityMainBinding
 import com.duridudu.oneone2.model.User
+import com.duridudu.oneone2.viewmodel.DiaryViewModel
 import com.duridudu.oneone2.viewmodel.UserViewModel
 import io.github.muddz.styleabletoast.StyleableToast
 import kotlinx.coroutines.CoroutineScope
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var userViewModel: UserViewModel
+    private lateinit var diaryViewModel: DiaryViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var binding = ActivityMainBinding.inflate(layoutInflater)
@@ -24,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         val bottomBar = binding.bottomNavigation
         setContentView(view)
         userViewModel  = ViewModelProvider(this)[UserViewModel::class.java]
+        diaryViewModel = ViewModelProvider(this)[DiaryViewModel::class.java]
         Log.d("MAIN++1", "TEST")
         CoroutineScope(Dispatchers.Main).launch{
             // 코루틴 내에서 getUser() 메서드 호출
@@ -48,6 +51,7 @@ class MainActivity : AppCompatActivity() {
                   changeFragment(Calender())
               }
                   R.id.tab2->{
+                      diaryViewModel.initSelectedDiary()
                       changeFragment(Write())
                   }
                   R.id.tab3->{

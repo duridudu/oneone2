@@ -55,25 +55,26 @@ class Calender : Fragment() {
 
     // 선택된 날짜 저장
     private var selectedDate: String? = null
+    private lateinit var today:CalendarDay
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         //binding.calendarView.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays)))
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding=FragmentCalenderBinding.inflate(inflater)
-        val today = CalendarDay.today()
+        today = CalendarDay.today()
 
         // 오늘 날짜를 자동으로 선택
         binding.calendarView.setDateSelected(today, true)
+
+
         // 다른 날짜 클릭 시 일정 불러오기
         binding.calendarView.setOnDateChangedListener(object:OnDateSelectedListener{
             override fun onDateSelected(
@@ -136,6 +137,15 @@ class Calender : Fragment() {
         }
 
         initFirebase()
+
+        today = CalendarDay.today()
+        if (today!!.month < 10){
+            selectedDate = "${today.year}-0${today.month}-${today.day}"
+        }else{
+            selectedDate = "${today.year}-${today.month}-${today.day}"
+        }
+        Log.d("CALENDER++", "초기화"+selectedDate.toString())
+        fetchDiariesForSelectedDate(selectedDate!!)
         //initCalenderView()
 
     }
@@ -205,7 +215,7 @@ class Calender : Fragment() {
                     DotDecorator(requireContext(), R.color.main, datesWithEntries)
                 )
                 //notifyDataSetChanged()를 호출하여 adapter에게 값이 변경 되었음을 알려준다.
-                diaryAdapter.submitList(diariesList)
+               // diaryAdapter.submitList(diariesList)
                 Log.d("CALENDER++", "AFTER adopter")
             }
             override fun onCancelled(error: DatabaseError) {
