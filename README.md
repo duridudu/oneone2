@@ -78,3 +78,4 @@ oneone2
 ## ⚪️ 프로젝트 산출물
 - [일일이 Notion 워크스페이스 가기](https://woozy-passbook-d4b.notion.site/3d0a32e4d2904317a37bdc4508057f96?pvs=4)
 
+* 단기 개인 프로젝트라 git은 마스터브랜치를 사용하였음
