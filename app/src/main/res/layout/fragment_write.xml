@@ -20,6 +20,7 @@
             android:hint="날짜를 선택하세요"
             android:textColor="@color/main"
             android:textSize="30sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
         <TextView
@@ -68,31 +69,33 @@
             android:id="@+id/btnPhoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="140dp"
-            android:layout_marginTop="108dp"
+            android:layout_marginTop="28dp"
             android:background="@drawable/shape_button"
             android:fontFamily="@font/hakgyoansim_wooju"
             android:text="사진 등록하기"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
+            app:layout_constraintTop_toBottomOf="@+id/btnWrite" />
 
         <Button
             android:id="@+id/btnWrite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="140dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="228dp"
             android:background="@drawable/shape_button"
             android:fontFamily="@font/hakgyoansim_wooju"
             android:text="일기 작성하기"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.503"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnPhoto" />
+            app:layout_constraintTop_toBottomOf="@+id/title" />
 
         <EditText
             android:id="@+id/writeContent"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_margin="8dp"
+            android:layout_margin="15dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="5dp"
             android:background="@drawable/shape"
             android:fontFamily="@font/hakgyoansim_wooju"
@@ -102,7 +105,7 @@
             android:textSize="18sp"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnPhoto"></EditText>
+            app:layout_constraintTop_toBottomOf="@+id/title" ></EditText>
 
         <!-- 등록된 사진이 있는 경우를 위한 ImageView -->
         <ImageView
