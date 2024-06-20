@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "509001380980",
+    "firebase_url": "https://oneone2-4660f-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "oneone2-4660f",
     "storage_bucket": "oneone2-4660f.appspot.com"
   },
@@ -19,6 +20,14 @@
           "android_info": {
             "package_name": "com.duridudu.oneone2",
             "certificate_hash": "19d05b01d1e3d0093ea1d131969e8b7968b6ae41"
+          }
+        },
+        {
+          "client_id": "509001380980-snokodr10hs8pt77l3aq8ld384olvgqj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.duridudu.oneone2",
+            "certificate_hash": "a87ebeb4553388c497d5c6f2fe3e44fc9cbd7e7b"
           }
         },
         {

@@ -29,17 +29,16 @@ class LoginActivity : AppCompatActivity() {
     private val googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             result ->
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            Log.d("LOGIN--", task.toString())
+            Log.d("LOGIN++", task.toString())
             try {
                 // Google 로그인이 성공하면, Firebase로 인증합니다.
                 val account = task.getResult(ApiException::class.java)!!
-                Log.d("LOGIN--22", account.idToken!!)
+                Log.d("LOGIN++22", account.idToken!!)
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
                 // Google 로그인 실패
                 Toast.makeText(this, "Google 로그인에 실패했습니다.", Toast.LENGTH_SHORT).show()
             }
-
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +67,7 @@ class LoginActivity : AppCompatActivity() {
                 userViewModel.insert(nowUser)
             }
 
-
+            //userViewModel.setUser(nowUser)
            //val nowUser2:User = userViewModel.getUser()
             //Toast.makeText(this, "환영합니다, ${nowUser2}!", Toast.LENGTH_SHORT).show()
 
@@ -114,11 +113,11 @@ class LoginActivity : AppCompatActivity() {
                     //Toast.makeText(this, "환영합니다, ${user?.displayName}!", Toast.LENGTH_SHORT).show()
                     // 여기서 로그인 후 화면 전환 등의 작업을 수행할 수 있습니다.
                     startActivity(Intent(this, MainActivity::class.java))
-                    finish()
                 } else {
                     // 로그인 실패
                     Toast.makeText(this, "Firebase 인증에 실패했습니다.", Toast.LENGTH_SHORT).show()
                 }
+                finish()
             }
     }
 }

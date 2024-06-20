@@ -11,13 +11,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.duridudu.oneone2.adapter.DiaryAdapter
 import com.duridudu.oneone2.databinding.FragmentWriteBinding
 import com.duridudu.oneone2.model.Diary
 import com.duridudu.oneone2.viewmodel.DiaryViewModel
+import com.duridudu.oneone2.viewmodel.UserViewModel
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import io.github.muddz.styleabletoast.StyleableToast
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -53,6 +56,7 @@ class Write : Fragment() {
 
     // 작성된 글일 경우 불러오기 위한 뷰모델
     private lateinit var viewModel: DiaryViewModel
+    private lateinit var userViewModel:UserViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -153,7 +157,7 @@ class Write : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(requireActivity()).get(DiaryViewModel::class.java)
-
+        userViewModel = ViewModelProvider(requireActivity()).get(UserViewModel::class.java)
         // ViewModel에서 선택된 Diary 가져오기
         var selectedDiary = viewModel.getSelectedDiary()
 
@@ -205,10 +209,12 @@ class Write : Fragment() {
 
         // 최종 등록 버튼
         binding.btnRegister.setOnClickListener {
-            if (binding.title.text.isEmpty()){
+            if ((binding.title.text.isEmpty()) or (binding.title.text.equals("일정을 입력하세요."))){
+                Log.d("WRITE++","빈칸 토스트;;;;")
                 StyleableToast.makeText(requireContext(), "제목을 입력해주세요!", R.style.myToast).show()
             }
             else{
+                Log.d("WRITE++","저장 토스트;;;;")
                 StyleableToast.makeText(requireContext(), "저장되었습니다.",R.style.myToast).show()
             }
 
@@ -310,22 +316,27 @@ class Write : Fragment() {
 
     private fun initFirebase(s: String, key:String?) {
         var key = key
-        userId = "BKNnNTkD5kgW1VILsAtiib5Tpks2"
-        // Firebase Database 인스턴스 초기화
-        database = FirebaseDatabase.getInstance("https://oneone2-4660f-default-rtdb.asia-southeast1.firebasedatabase.app")
-        try {
-            if (s == "create"){
-                diaryRef = database.getReference("users/$userId/diaries")
-                Log.d("WRITE++", "IN NEW initFirebase")
+        // 코루틴 스코프 내에서 getUser() 호출
+        lifecycleScope.launch {
+            val user = userViewModel.getUser()
+            val userId = user.uid
+            // userId를 사용하는 로직 추가
+            // Firebase Database 인스턴스 초기화
+            database = FirebaseDatabase.getInstance("https://oneone2-4660f-default-rtdb.asia-southeast1.firebasedatabase.app")
+            try {
+                if (s == "create"){
+                    diaryRef = database.getReference("users/$userId/diaries")
+                    Log.d("WRITE++", "IN NEW initFirebase")
 
-            }
-            else{
-                diaryRef = database.getReference("users/$userId/diaries/$key")
-                Log.d("WRITE++", "IN UPDATE initFirebase")
-            }
+                }
+                else{
+                    diaryRef = database.getReference("users/$userId/diaries/$key")
+                    Log.d("WRITE++", "IN UPDATE initFirebase")
+                }
 
-        } catch (e: Exception) {
-            Log.e("WRITE++", "Firebase initialization failed", e)
+            } catch (e: Exception) {
+                Log.e("WRITE++", "Firebase initialization failed", e)
+            }
         }
     }
     private fun getCurrentTimestamp(): String {

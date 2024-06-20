@@ -11,14 +11,21 @@ android {
 
     defaultConfig {
         applicationId = "com.duridudu.oneone2"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
-        versionCode = 1001
+        versionCode = 1003
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+//    signingConfigs {
+//        release {
+//            keyAlias = "oneone2"
+//            keyPassword = "931026"
+//            storeFile =  file("oneone2keystore.jks")
+//            storePassword = "931026"
+//        }
+//    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -26,6 +33,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+//            release {
+//                signingConfig = signingConfigs.release
+//                // 다른 release build 설정들...
+//            }
         }
     }
     compileOptions {

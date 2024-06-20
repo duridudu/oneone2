@@ -8,12 +8,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duridudu.oneone2.adapter.DiaryAdapter
 import com.duridudu.oneone2.databinding.FragmentListBinding
 import com.duridudu.oneone2.databinding.ItemDiariesBinding
 import com.duridudu.oneone2.model.Diary
+import com.duridudu.oneone2.model.User
 import com.duridudu.oneone2.viewmodel.DiaryViewModel
+import com.duridudu.oneone2.viewmodel.UserViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -47,6 +50,7 @@ class Lists: Fragment() {
     private var diariesList = mutableListOf<Diary>()
     // 프래그먼트 이동을 위한 뷰모델
     private lateinit var viewModel: DiaryViewModel
+    private lateinit var userViewModel: UserViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -64,6 +68,7 @@ class Lists: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(requireActivity())[DiaryViewModel::class.java]
+        userViewModel = ViewModelProvider(requireActivity())[UserViewModel::class.java]
         Log.d("LIST++", "onViewCreated")
 
         // 클릭 이벤트 처리법 같이 줌
@@ -87,24 +92,35 @@ class Lists: Fragment() {
 
         Log.d("LIST++", "after adapter")
         // Firebase 초기화 및 데이터 요청은 onViewCreated 내에서 처리
-        initFirebase()
+        CoroutineScope(Dispatchers.Main).launch {
+            initFirebase()
+        }
         Log.d("LIST++", "after initFirebase")
 
 
     }
 
 
-    private fun initFirebase() {
+    private suspend fun initFirebase() {
         try {
-            userId = "BKNnNTkD5kgW1VILsAtiib5Tpks2"
-            // Firebase Database 인스턴스 초기화
-            database = FirebaseDatabase.getInstance("https://oneone2-4660f-default-rtdb.asia-southeast1.firebasedatabase.app")
-            diaryRef = database.getReference("users/$userId/diaries")
-            Log.d("LIST++", "IN initFirebase")
+            // 코루틴 스코프 내에서 getUser() 호출
+            //lifecycleScope.launch {
 
-            // 데이터 요청
-            getFBContentData()
-            Log.d("LIST++", "after getFBContentData")
+                val user: User = userViewModel.getUser()
+                val userId = user.uid
+                Log.d("LIST++", "User $userId")
+               // val userId ="BKNnNTkD5kgW1VILsAtiib5Tpks2"
+                // userId를 사용하는 로직 추가
+                // Firebase Database 인스턴스 초기화
+                database = FirebaseDatabase.getInstance("https://oneone2-4660f-default-rtdb.asia-southeast1.firebasedatabase.app")
+                diaryRef = database.getReference("users/$userId/diaries")
+                Log.d("LIST++", "IN initFirebase")
+
+                // 데이터 요청
+                getFBContentData()
+                Log.d("LIST++", "after getFBContentData")
+
+
         } catch (e: Exception) {
             Log.e("LIST++", "Firebase initialization failed", e)
         }

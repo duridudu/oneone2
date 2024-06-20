@@ -10,13 +10,17 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duridudu.oneone2.adapter.DiaryAdapter
 import com.duridudu.oneone2.databinding.ActivityMainBinding
 import com.duridudu.oneone2.databinding.FragmentCalenderBinding
 import com.duridudu.oneone2.model.Diary
+import com.duridudu.oneone2.model.User
 import com.duridudu.oneone2.viewmodel.DiaryViewModel
+import com.duridudu.oneone2.viewmodel.UserViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -26,8 +30,11 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener
 import com.prolificinteractive.materialcalendarview.spans.DotSpan
+import io.github.muddz.styleabletoast.StyleableToast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-
 import java.util.Calendar
 import java.util.Locale
 
@@ -48,10 +55,11 @@ class Calender : Fragment() {
     lateinit var  diaryAdapter: DiaryAdapter
     private lateinit var database: FirebaseDatabase
     private lateinit var diaryRef: DatabaseReference
-    private lateinit var userId: String // 사용자의 고유 식별자
+    //private lateinit var userId: String // 사용자의 고유 식별자
     private var diariesList = mutableListOf<Diary>()
     // 프래그먼트 이동을 위한 뷰모델
     private lateinit var viewModel: DiaryViewModel
+    private lateinit var userViewModel: UserViewModel
 
     // 선택된 날짜 저장
     private var selectedDate: String? = null
@@ -95,7 +103,9 @@ class Calender : Fragment() {
 
         return binding.root
     }
+
     private fun fetchDiariesForSelectedDate(date: String) {
+        Log.d("CALENDER", "fetchdiaries$date")
         diaryRef.orderByChild("timestamp").startAt("$date 00:00").endAt("$date 23:59")
             .addListenerForSingleValueEvent(object : ValueEventListener {
 
@@ -123,6 +133,7 @@ class Calender : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(requireActivity())[DiaryViewModel::class.java]
+        userViewModel  = ViewModelProvider(requireActivity())[UserViewModel::class.java]
         Log.d("CALENDER++", "onViewCreated")
 
         // 클릭 이벤트 처리법 같이 줌
@@ -136,18 +147,19 @@ class Calender : Fragment() {
             adapter = diaryAdapter
         }
 
-        initFirebase()
+        CoroutineScope(Dispatchers.Main).launch {
+            initFirebase()
 
-        today = CalendarDay.today()
-        if (today!!.month < 10){
-            selectedDate = "${today.year}-0${today.month}-${today.day}"
-        }else{
-            selectedDate = "${today.year}-${today.month}-${today.day}"
+            today = CalendarDay.today()
+            if (today!!.month < 10) {
+                selectedDate = "${today.year}-0${today.month}-${today.day}"
+            } else {
+                selectedDate = "${today.year}-${today.month}-${today.day}"
+            }
+            Log.d("CALENDER++", "초기화" + selectedDate.toString())
+            fetchDiariesForSelectedDate(selectedDate!!)
+            //initCalenderView()
         }
-        Log.d("CALENDER++", "초기화"+selectedDate.toString())
-        fetchDiariesForSelectedDate(selectedDate!!)
-        //initCalenderView()
-
     }
 
     private fun initCalenderView() {
@@ -155,22 +167,32 @@ class Calender : Fragment() {
     }
 
 
-    private fun initFirebase() {
-        try {
-            userId = "BKNnNTkD5kgW1VILsAtiib5Tpks2"
-            // Firebase Database 인스턴스 초기화
-            database = FirebaseDatabase.getInstance("https://oneone2-4660f-default-rtdb.asia-southeast1.firebasedatabase.app")
-            diaryRef = database.getReference("users/$userId/diaries")
-            Log.d("CALENDER++", "IN initFirebase")
 
-            // 데이터 요청
-            getFBContentData()
-            Log.d("CALENDER++", "after getFBContentData")
+    private suspend fun initFirebase() {
+
+        try {
+            // 코루틴 스코프 내에서 getUser() 호출
+
+                Log.d("CALENDER++", "IN coroutine")
+                val user: User = userViewModel.getUser()
+                val userId = user.uid
+                Log.d("CALENDER++", "after corutine")
+                 //val userId ="BKNnNTkD5kgW1VILsAtiib5Tpks2"
+                // userId를 사용하는 로직 추가
+                // Firebase Database 인스턴스 초기화
+                database = FirebaseDatabase.getInstance("https://oneone2-4660f-default-rtdb.asia-southeast1.firebasedatabase.app")
+                diaryRef = database.getReference("users/$userId/diaries")
+                Log.d("CALENDER++", "IN initFirebase")
+
+                // 데이터 요청
+                getFBContentData()
+                Log.d("LIST++", "after getFBContentData")
+
+
         } catch (e: Exception) {
-            Log.e("CALENDER++", "Firebase initialization failed", e)
+            Log.e("LIST++", "Firebase initialization failed", e)
         }
     }
-
     private fun getFBContentData() {
         Log.d("CALENDER++", "IN getFBContentData")
         val postListener = object : ValueEventListener {
@@ -180,7 +202,6 @@ class Calender : Fragment() {
                 diariesList.clear()
                 Log.d("CALENDER++", snapshot.childrenCount.toString())
                 for (diarySnapshot in snapshot.children) {
-
                     val diary = diarySnapshot.getValue(Diary::class.java)
                     if (diary != null) {
                         //diary.title?.let { Log.d("LIST++", it) }
@@ -211,6 +232,7 @@ class Calender : Fragment() {
 
                     }
                 }
+
                 binding.calendarView.addDecorators(
                     DotDecorator(requireContext(), R.color.main, datesWithEntries)
                 )
@@ -237,7 +259,7 @@ class Calender : Fragment() {
     class DotDecorator(
         private val context: Context,
         private val colorResId: Int,
-        private val dates: List<CalendarDay>
+        private val dates: MutableList<CalendarDay>
     ) :
         com.prolificinteractive.materialcalendarview.DayViewDecorator {
 
