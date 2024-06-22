@@ -13,7 +13,7 @@ android {
         applicationId = "com.duridudu.oneone2"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1003
+        versionCode = 1004
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

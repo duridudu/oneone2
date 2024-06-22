@@ -1,6 +1,7 @@
 package com.duridudu.oneone2
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -10,12 +11,9 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duridudu.oneone2.adapter.DiaryAdapter
-import com.duridudu.oneone2.databinding.ActivityMainBinding
 import com.duridudu.oneone2.databinding.FragmentCalenderBinding
 import com.duridudu.oneone2.model.Diary
 import com.duridudu.oneone2.model.User
@@ -27,10 +25,10 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.prolificinteractive.materialcalendarview.CalendarDay
+import com.prolificinteractive.materialcalendarview.DayViewDecorator
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener
 import com.prolificinteractive.materialcalendarview.spans.DotSpan
-import io.github.muddz.styleabletoast.StyleableToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -81,7 +79,6 @@ class Calender : Fragment() {
 
         // 오늘 날짜를 자동으로 선택
         binding.calendarView.setDateSelected(today, true)
-
 
         // 다른 날짜 클릭 시 일정 불러오기
         binding.calendarView.setOnDateChangedListener(object:OnDateSelectedListener{
@@ -195,6 +192,8 @@ class Calender : Fragment() {
     }
     private fun getFBContentData() {
         Log.d("CALENDER++", "IN getFBContentData")
+
+
         val postListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 Log.d("CALENDER++", "onData")
@@ -204,7 +203,7 @@ class Calender : Fragment() {
                 for (diarySnapshot in snapshot.children) {
                     val diary = diarySnapshot.getValue(Diary::class.java)
                     if (diary != null) {
-                        //diary.title?.let { Log.d("LIST++", it) }
+                        diary.title?.let { Log.d("LIST++", it) }
                         diary?.let {
                             // diary.timestamp에서 월 정보 가져오기
                             val dateString = it.timestamp
@@ -233,9 +232,28 @@ class Calender : Fragment() {
                     }
                 }
 
-                binding.calendarView.addDecorators(
-                    DotDecorator(requireContext(), R.color.main, datesWithEntries)
-                )
+
+                // 중복을 제거한 후의 리스트
+                val uniqueCalendarDays = datesWithEntries.toSet().toHashSet()
+                Log.d("CALENDER++", uniqueCalendarDays.toString())
+                Log.d("CALENDER++", "BEFORE dot1")
+                // DotDecorator 업데이트
+                var dotDecorator = DotDecorator(uniqueCalendarDays)
+                Log.d("CALENDER++", "BEFORE dot2")
+                binding.calendarView.removeDecorator(dotDecorator) // 기존 decorator 제거
+                Log.d("CALENDER++", "BEFORE dot3")
+                binding.calendarView.addDecorators(dotDecorator) // 새로운 decorator 추가
+
+                Log.d("CALENDER++", "BEFORE dot4")
+                // 캘린더뷰 갱신
+                binding.calendarView.invalidateDecorators()
+
+                // 캘린더뷰 갱신
+//
+//                binding.calendarView.addDecorators(
+//                    DotDecorator(requireContext(), R.color.main, datesWithEntries)
+//                )
+
                 //notifyDataSetChanged()를 호출하여 adapter에게 값이 변경 되었음을 알려준다.
                // diaryAdapter.submitList(diariesList)
                 Log.d("CALENDER++", "AFTER adopter")
@@ -257,36 +275,20 @@ class Calender : Fragment() {
 
     // Custom decorator 구현 - 일정 있는 날짜
     class DotDecorator(
-        private val context: Context,
-        private val colorResId: Int,
-        private val dates: MutableList<CalendarDay>
+        private val dates: Set<CalendarDay>
     ) :
-        com.prolificinteractive.materialcalendarview.DayViewDecorator {
+        DayViewDecorator {
 
-        private val color: Int = ContextCompat.getColor(context, colorResId)
+
         override fun shouldDecorate(day: CalendarDay): Boolean {
             return dates.contains(day)
         }
 
         override fun decorate(view: com.prolificinteractive.materialcalendarview.DayViewFacade) {
-            view.addSpan(DotSpan(5f, color) )// 점 추가
+            view.addSpan(DotSpan(5f, R.color.main ))// 점 추가
         }
     }
 
-
-    // Custom decorator 구현 - 오늘 날짜
-    class TodayDecorator(private val context: Context, private val colorResId: Int, private val dates: List<CalendarDay>) :
-        com.prolificinteractive.materialcalendarview.DayViewDecorator {
-
-        private val color: Int = ContextCompat.getColor(context, colorResId)
-        override fun shouldDecorate(day: CalendarDay): Boolean {
-            return dates.contains(day)
-        }
-
-        override fun decorate(view: com.prolificinteractive.materialcalendarview.DayViewFacade) {
-            view.addSpan(DotSpan(5f, color) )// 점 추가
-        }
-    }
 
 
 }

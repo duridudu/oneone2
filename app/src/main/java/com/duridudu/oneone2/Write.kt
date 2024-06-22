@@ -20,6 +20,8 @@ import com.duridudu.oneone2.viewmodel.UserViewModel
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import io.github.muddz.styleabletoast.StyleableToast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -184,14 +186,15 @@ class Write : Fragment() {
             diaryId = selectedDiary.diaryId.toString()
 
             Log.d("WRITE++", "UPDATE : $diaryId")
-
+            CoroutineScope(Dispatchers.Main).launch {
             // 수정 버전으로 파이어베이스 생성
-            initFirebase("update", diaryId)
+            initFirebase("update", diaryId)}
         }
         else{
             Log.d("WRITE++", "CREATE")
+            CoroutineScope(Dispatchers.Main).launch {
             // 신규 추가 버전으로 파이어베이스 생성
-            initFirebase("create", null)
+            initFirebase("create", null)}
         }
         
         // 사진 등록
@@ -214,8 +217,8 @@ class Write : Fragment() {
                 StyleableToast.makeText(requireContext(), "제목을 입력해주세요!", R.style.myToast).show()
             }
             else{
-                Log.d("WRITE++","저장 토스트;;;;")
-                StyleableToast.makeText(requireContext(), "저장되었습니다.",R.style.myToast).show()
+//                Log.d("WRITE++","저장 토스트;;;;")
+//                StyleableToast.makeText(requireContext(), "저장되었습니다.",R.style.myToast).show()
             }
 
             Log.d("WRITE++", "Register : $diaryId")
@@ -237,10 +240,12 @@ class Write : Fragment() {
                     .addOnSuccessListener {
                     // 성공적으로 업데이트된 경우 처리할 로직
                     Log.d("Firebase", "Diary updated successfully")
+                        Log.d("WRITE++","저장 토스트;;;;")
+                        StyleableToast.makeText(requireContext(), "저장되었습니다.",R.style.myToast).show()
                 }
                     .addOnFailureListener { e ->
                         // 업데이트 실패 시 처리할 로직
-                        Log.w("Firebase", "Error updating diary", e)
+                        Log.w("WRITE++", "Error updating diary", e)
                     }
             }
             else{
@@ -257,6 +262,14 @@ class Write : Fragment() {
                 Log.d("WRITE++", "신규작성후$diaryId.toString()")
                 // Diary 객체에 고유 키 설정
                 newDiaryRef.child("diaryId").setValue(diaryId)
+                    .addOnSuccessListener {
+                        Log.d("WRITE++","저장 토스트;;;;")
+                        StyleableToast.makeText(requireContext(), "저장되었습니다.",R.style.myToast).show()
+                    }
+                    .addOnFailureListener {e->
+                        // 업데이트 실패 시 처리할 로직
+                        Log.w("WRITE++", "Error updating diary", e)
+                    }
             }
 
         }
@@ -314,10 +327,10 @@ class Write : Fragment() {
         return formattedDateTime
     }
 
-    private fun initFirebase(s: String, key:String?) {
+    private suspend fun initFirebase(s: String, key:String?) {
         var key = key
         // 코루틴 스코프 내에서 getUser() 호출
-        lifecycleScope.launch {
+        //lifecycleScope.launch {
             val user = userViewModel.getUser()
             val userId = user.uid
             // userId를 사용하는 로직 추가
@@ -337,7 +350,7 @@ class Write : Fragment() {
             } catch (e: Exception) {
                 Log.e("WRITE++", "Firebase initialization failed", e)
             }
-        }
+       // }//
     }
     private fun getCurrentTimestamp(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
