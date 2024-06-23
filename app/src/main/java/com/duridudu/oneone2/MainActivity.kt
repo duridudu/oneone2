@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
             // 코루틴 내에서 getUser() 메서드 호출
             val user: User = userViewModel.getUser()
             userViewModel.setUser(user)
-            Log.d("MainActivity", "User: ${user.uid}")
+            Log.d("MainActivity++", "User: ${user.uid}")
             val names = user.name
             // 여기서 UI를 업데이트하는 작업 수행
             StyleableToast.makeText(applicationContext, "환영합니다, ${user.name}! 🥰", R.style.myToast).show()

@@ -72,7 +72,17 @@ class Write : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding= FragmentWriteBinding.inflate(inflater)
-        initTextView()
+        var value = LocalDateTime.now().toString()
+        // 선택된 날짜 가져옴
+//        val value = arguments?.getString("bundle")
+//        if (value != null) {
+//            Log.d("WRITE++", "INIT$value")
+//        }
+
+        if (value != null) {
+            initTextView(value)
+        }
+
         // 날짜 선택
         binding.writeDate.setOnClickListener {
             showDatePicker()
@@ -126,8 +136,9 @@ class Write : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun initTextView() {
-        val currentDateTime = LocalDateTime.now()
+    private fun initTextView(date:String) {
+
+        val currentDateTime =  LocalDateTime.parse(date)
 
         // 원하는 형식으로 포맷 지정
         // 원하는 형식으로 포맷 지정

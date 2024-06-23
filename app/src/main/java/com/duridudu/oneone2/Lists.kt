@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +16,7 @@ import com.duridudu.oneone2.adapter.DiaryAdapter
 import com.duridudu.oneone2.databinding.FragmentListBinding
 import com.duridudu.oneone2.databinding.ItemDiariesBinding
 import com.duridudu.oneone2.model.Diary
+import com.duridudu.oneone2.model.DiaryDao
 import com.duridudu.oneone2.model.User
 import com.duridudu.oneone2.viewmodel.DiaryViewModel
 import com.duridudu.oneone2.viewmodel.UserViewModel
@@ -22,6 +25,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import io.github.muddz.styleabletoast.StyleableToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,7 +43,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [Lists.newInstance] factory method to
  * create an instance of this fragment.
  */
-class Lists: Fragment() {
+class Lists: Fragment(), DiaryDao {
     // TODO: Rename and change types of parameters
     lateinit var binding:FragmentListBinding
     lateinit var listBinding: ItemDiariesBinding
@@ -61,6 +65,16 @@ class Lists: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        viewModel = ViewModelProvider(requireActivity())[DiaryViewModel::class.java]
+        userViewModel  = ViewModelProvider(requireActivity())[UserViewModel::class.java]
+        // 삭제된 Diary LiveData 관찰
+        viewModel.deleteDiary.observe(viewLifecycleOwner, Observer { deleteDiary ->
+            deleteDiary?.let {
+                Log.d("CALENDER++", "삭제된 Diary: ${deleteDiary.title}")
+                // 삭제된 아이템 제거
+                diaryAdapter.removeItem(deleteDiary)
+            }
+        })
         binding= FragmentListBinding.inflate(inflater)
         return binding.root
     }
@@ -72,12 +86,12 @@ class Lists: Fragment() {
         Log.d("LIST++", "onViewCreated")
 
         // 클릭 이벤트 처리법 같이 줌
-        diaryAdapter = DiaryAdapter { diary ->
+        diaryAdapter = DiaryAdapter ({ diary ->
             viewModel.setSelectedDiary(diary)
             navigateToWriteFragment()
-
-
-        }
+        },
+            onDeleteClickListener = this
+        )
 
         binding.listRecyclerview.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -197,5 +211,19 @@ class Lists: Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    override fun onDeleteClick(diary: Diary) {
+        //                // CoroutineScope를 생성하여 코루틴 빌더를 사용
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                viewModel.deleteDiary(diary, userViewModel.getUser().uid)
+                // 삭제 성공 메시지 표시d
+                Toast.makeText(requireContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                // 삭제 실패 메시지 표시
+                Toast.makeText(requireContext(), "삭제 실패했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

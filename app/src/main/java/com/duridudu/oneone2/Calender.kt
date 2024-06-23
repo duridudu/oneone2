@@ -1,22 +1,23 @@
 package com.duridudu.oneone2
 
-import android.content.Context
-import android.graphics.Color
+
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duridudu.oneone2.adapter.DiaryAdapter
 import com.duridudu.oneone2.databinding.FragmentCalenderBinding
 import com.duridudu.oneone2.model.Diary
 import com.duridudu.oneone2.model.User
+import com.duridudu.oneone2.model.DiaryDao
 import com.duridudu.oneone2.viewmodel.DiaryViewModel
 import com.duridudu.oneone2.viewmodel.UserViewModel
 import com.google.firebase.database.DataSnapshot
@@ -33,6 +34,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.Calendar
 import java.util.Locale
 
@@ -47,7 +51,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 @Suppress("UNREACHABLE_CODE")
-class Calender : Fragment() {
+class Calender : Fragment(),DiaryDao {
 
     lateinit var binding:FragmentCalenderBinding
     lateinit var  diaryAdapter: DiaryAdapter
@@ -77,8 +81,17 @@ class Calender : Fragment() {
         binding=FragmentCalenderBinding.inflate(inflater)
         today = CalendarDay.today()
 
+        viewModel = ViewModelProvider(requireActivity())[DiaryViewModel::class.java]
+        userViewModel  = ViewModelProvider(requireActivity())[UserViewModel::class.java]
+
         // 오늘 날짜를 자동으로 선택
         binding.calendarView.setDateSelected(today, true)
+        val bundle = Bundle().apply {
+            putString("date", today.toString())
+        }
+        // Write 프래그먼트 인스턴스 생성
+        val writeFragment = Write()
+        writeFragment.arguments = bundle
 
         // 다른 날짜 클릭 시 일정 불러오기
         binding.calendarView.setOnDateChangedListener(object:OnDateSelectedListener{
@@ -95,6 +108,46 @@ class Calender : Fragment() {
                 }
                 Log.d("CALENDER++", "setOnDateChanged2$selectedDate")
                 fetchDiariesForSelectedDate(selectedDate!!)
+
+                // write에 클릭한 날짜 셋팅
+                // Calendar 프래그먼트에서 Write 프래그먼트로 데이터 전달 예제
+                // CalenderDay to datetime
+                val localDate = LocalDate.of(date.year, date.month + 1, date.day)
+                // LocalDate를 LocalDateTime으로 변환 (시간은 0시 0분으로 설정)
+                val localDateTime = LocalDateTime.of(localDate, LocalTime.of(0, 0))
+                val bundle = Bundle().apply {
+//                    putString("date", localDateTime.toString())
+                    putString("bundle", "YESSS")
+                    Log.d("CALENDER++","ONCLICK")
+                    // 필요한 경우 다른 데이터 추가 가능
+                }// Write 프래그먼트 인스턴스 생성
+                val writeFragment = Write()
+                writeFragment.arguments = bundle
+
+            }
+        })
+//
+// 삭제 결과 LiveData 관찰
+//        viewModel.deleteResult.observe(viewLifecycleOwner, Observer { isSuccess ->
+//            isSuccess?.let {
+//                if (isSuccess) {
+//                    Log.d("CALENDER++", "삭제 성공")
+//                    // 삭제 성공 처리
+//                    Toast.makeText(requireContext(), "삭제 성공", Toast.LENGTH_SHORT).show()
+//                } else {
+//                    Log.d("CALENDER++", "삭제 실패")
+//                    // 삭제 실패 처리
+//                    Toast.makeText(requireContext(), "삭제 실패", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        })
+
+    // 삭제된 Diary LiveData 관찰
+        viewModel.deleteDiary.observe(viewLifecycleOwner, Observer { deleteDiary ->
+            deleteDiary?.let {
+                Log.d("CALENDER++", "삭제된 Diary: ${deleteDiary.title}")
+                // 삭제된 아이템 제거
+                diaryAdapter.removeItem(deleteDiary)
             }
         })
 
@@ -129,15 +182,16 @@ class Calender : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(requireActivity())[DiaryViewModel::class.java]
-        userViewModel  = ViewModelProvider(requireActivity())[UserViewModel::class.java]
+
         Log.d("CALENDER++", "onViewCreated")
 
         // 클릭 이벤트 처리법 같이 줌
-        diaryAdapter = DiaryAdapter { diary ->
+        diaryAdapter = DiaryAdapter ({ diary ->
             viewModel.setSelectedDiary(diary)
             navigateToWriteFragment()
-        }
+        },
+            onDeleteClickListener = this
+        )
 
         binding.calendarRecyclerview.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -279,13 +333,26 @@ class Calender : Fragment() {
     ) :
         DayViewDecorator {
 
-
         override fun shouldDecorate(day: CalendarDay): Boolean {
             return dates.contains(day)
         }
 
         override fun decorate(view: com.prolificinteractive.materialcalendarview.DayViewFacade) {
             view.addSpan(DotSpan(5f, R.color.main ))// 점 추가
+        }
+    }
+
+    override fun onDeleteClick(diary:Diary){
+        //                // CoroutineScope를 생성하여 코루틴 빌더를 사용
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                viewModel.deleteDiary(diary, userViewModel.getUser().uid)
+                        // 삭제 성공 메시지 표시d
+                Toast.makeText(requireContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                        // 삭제 실패 메시지 표시
+                Toast.makeText(requireContext(), "삭제 실패했습니다.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

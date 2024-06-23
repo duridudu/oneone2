@@ -9,4 +9,21 @@ data class Diary(
     val content: String? = null,
     val timestamp: String? = null,
     val photoUrl: String? = null
-)
+){
+    // equals() 메서드 재정의
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Diary
+
+        if (diaryId != other.diaryId) return false
+
+        return true
+    }
+
+    // hashCode() 메서드 재정의
+    override fun hashCode(): Int {
+        return diaryId?.hashCode() ?: 0
+    }
+}
