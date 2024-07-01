@@ -65,7 +65,6 @@ oneone2
         - photo(null)
         - timestamp (yyyy/mm/dd hh:mm)
 
-
 ### **Plugins**
     - Login : Firebase Authentication
     - Server Databse : Firebase Realtime Database
