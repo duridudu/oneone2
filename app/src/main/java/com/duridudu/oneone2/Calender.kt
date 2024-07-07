@@ -101,8 +101,12 @@ class Calender : Fragment(),DiaryDao {
                 selected: Boolean
             ) {
                 Log.d("CALENDER++", "setOnDateChanged${date.month}")
-                if (date.month < 10){
+                if ((date.month < 10) and (date.day < 10) ){
+                    selectedDate = "${date.year}-0${date.month}-0${date.day}"
+                }else if((date.month < 10) and (date.day >= 10) ) {
                     selectedDate = "${date.year}-0${date.month}-${date.day}"
+                }else if ((date.month >= 10) and (date.day < 10) ){
+                    selectedDate = "${date.year}-${date.month}-0${date.day}"
                 }else{
                     selectedDate = "${date.year}-${date.month}-${date.day}"
                 }
