@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.duridudu.oneone2.databinding.ItemDiariesBinding
@@ -70,8 +69,8 @@ class DiaryAdapter(private val onItemClick: (Diary) -> Unit,
         return diaries.size
     }
 
-    fun submitList(diaries: MutableList<Diary>) {
-        this.diaries = diaries
+    fun submitList(diaries: List<Diary>) {
+        this.diaries = diaries.toMutableList()
         Log.d("ADOPTER++", diaries.size.toString())
         notifyDataSetChanged()
     }

@@ -6,19 +6,21 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duridudu.oneone2.model.Diary
 import com.duridudu.oneone2.model.User
+import com.duridudu.oneone2.repository.DiaryRepository
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class DiaryViewModel:ViewModel() {
+class DiaryViewModel(private val repository: DiaryRepository):ViewModel() {
     private var selectedDiary: Diary? = null
     private lateinit var database: FirebaseDatabase
     private lateinit var diaryRef: DatabaseReference
     private lateinit var userViewModel: UserViewModel
-
     // LiveData를 통해 삭제 작업의 성공 여부를 알림
     private val _deleteResult = MutableLiveData<Boolean>()
     private val _deleteDiary = MutableLiveData<Diary>()
@@ -27,6 +29,10 @@ class DiaryViewModel:ViewModel() {
     val deleteDiary: LiveData<Diary>
         get() = _deleteDiary
 
+    private var _diariesList = MutableLiveData<List<Diary>>()
+
+    val diaries: MutableLiveData<List<Diary>>
+        get() = _diariesList
 
     fun setSelectedDiary(diary: Diary) {
         selectedDiary = diary
@@ -34,6 +40,21 @@ class DiaryViewModel:ViewModel() {
 
     fun getSelectedDiary(): Diary? {
         return selectedDiary
+    }
+
+//    fun getDiaries(userId: String, callback: (MutableList<Diary>) -> Unit) {
+//        repository.getDiaries(userId, callback)
+//    }
+    fun getDiaries(userId: String) {
+        viewModelScope.launch {
+            try {
+                val diariesList = repository.getDiaries(userId)
+                _diariesList.value = diariesList
+            } catch (e: Exception) {
+                // 오류 처리
+                Log.e("DiaryViewModel", "Error fetching diaries", e)
+            }
+        }
     }
 
     // 초기화 메서드

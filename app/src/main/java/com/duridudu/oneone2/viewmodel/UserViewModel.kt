@@ -37,7 +37,10 @@ class UserViewModel:ViewModel() {
             user // 사용자 정보 반환
         }
     }
-
+    fun getUser3(): User {
+        val user:User = userRepository.getUser3()
+        return user
+    }
     // 코루틴을 사용하여 사용자 정보 가져오기
     fun getUser2(): LiveData<User> {
         val userLiveData = MutableLiveData<User>()

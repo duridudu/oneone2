@@ -1,6 +1,6 @@
 package com.duridudu.oneone2
 
-import android.content.Intent
+import DiaryViewModelFactory
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duridudu.oneone2.adapter.DiaryAdapter
 import com.duridudu.oneone2.databinding.FragmentListBinding
@@ -18,6 +17,7 @@ import com.duridudu.oneone2.databinding.ItemDiariesBinding
 import com.duridudu.oneone2.model.Diary
 import com.duridudu.oneone2.model.DiaryDao
 import com.duridudu.oneone2.model.User
+import com.duridudu.oneone2.repository.DiaryRepository
 import com.duridudu.oneone2.viewmodel.DiaryViewModel
 import com.duridudu.oneone2.viewmodel.UserViewModel
 import com.google.firebase.database.DataSnapshot
@@ -25,7 +25,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import io.github.muddz.styleabletoast.StyleableToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,9 +63,10 @@ class Lists: Fragment(), DiaryDao {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        viewModel = ViewModelProvider(requireActivity())[DiaryViewModel::class.java]
+        val repository = DiaryRepository()
+        viewModel = ViewModelProvider(requireActivity(), DiaryViewModelFactory(repository))[DiaryViewModel::class.java]
         userViewModel  = ViewModelProvider(requireActivity())[UserViewModel::class.java]
+
         // 삭제된 Diary LiveData 관찰
         viewModel.deleteDiary.observe(viewLifecycleOwner, Observer { deleteDiary ->
             deleteDiary?.let {
@@ -75,10 +75,22 @@ class Lists: Fragment(), DiaryDao {
                 diaryAdapter.removeItem(deleteDiary)
             }
         })
+        // LiveData 관찰
+        viewModel.diaries.observe(viewLifecycleOwner, Observer { diaries ->
+            // 데이터가 변경될 때 UI 업데이트
+            // 예: RecyclerView에 데이터 설정
+            diaryAdapter.submitList(diaries)
+        })
+
         binding= FragmentListBinding.inflate(inflater)
         return binding.root
     }
 
+    private fun fetchData(userId: String) {
+        // ViewModel을 통해 getDiaries 메서드 호출
+        // 데이터 요청
+        viewModel.getDiaries(userId)
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(requireActivity())[DiaryViewModel::class.java]
@@ -97,18 +109,17 @@ class Lists: Fragment(), DiaryDao {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = diaryAdapter
         }
-
-
-//        binding.listRecyclerview.layoutManager = LinearLayoutManager(requireContext())
-//        diaryAdapter = DiaryAdapter(requireContext(), )
-//        binding.listRecyclerview.adapter = diaryAdapter
+        val user: User = userViewModel.getUser3()
+        val userId = user.uid
+        // 데이터 가져오기
+        fetchData(userId) // 예시로 userId 전달
 
 
         Log.d("LIST++", "after adapter")
         // Firebase 초기화 및 데이터 요청은 onViewCreated 내에서 처리
-        CoroutineScope(Dispatchers.Main).launch {
-            initFirebase()
-        }
+//        CoroutineScope(Dispatchers.Main).launch {
+//            initFirebase()
+//        }
         Log.d("LIST++", "after initFirebase")
 
 
@@ -120,8 +131,7 @@ class Lists: Fragment(), DiaryDao {
             // 코루틴 스코프 내에서 getUser() 호출
             //lifecycleScope.launch {
 
-                val user: User = userViewModel.getUser()
-                val userId = user.uid
+
                 Log.d("LIST++", "User $userId")
                // val userId ="BKNnNTkD5kgW1VILsAtiib5Tpks2"
                 // userId를 사용하는 로직 추가
@@ -131,7 +141,7 @@ class Lists: Fragment(), DiaryDao {
                 Log.d("LIST++", "IN initFirebase")
 
                 // 데이터 요청
-                getFBContentData()
+              //  getFBContentData()
                 Log.d("LIST++", "after getFBContentData")
 
 

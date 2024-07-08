@@ -59,6 +59,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
     implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
+    implementation("com.google.android.ads:mediation-test-suite:3.0.0")
 
     testImplementation("junit:junit:4.13.2")
 

@@ -19,6 +19,9 @@ interface UserDao {
     @Query("select * from userTable limit 1")
    suspend fun getUser(): User
 
+    @Query("select * from userTable limit 1")
+    fun getUser3(): User
+
     @Query("select * from userTable where uid = (:id)")
     fun selectOne(id:String): User
 

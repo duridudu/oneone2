@@ -20,7 +20,7 @@ class UserRepository private constructor(context: Context){
 
     // 서비스단에서 사용할 함수(구 메소드 현 함수)
     suspend fun getUser():User = userDao.getUser()
-
+fun getUser3():User = userDao.getUser3()
     fun getOne(id:String):User = userDao.selectOne(id)
 
     suspend fun insert(dto: User) = userDao.insert(dto)
